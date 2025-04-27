@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE_NAME = 'sentiment_repo_cicd' // Replace with your image name
+        DOCKER_IMAGE_NAME_PREFIX = 'aks00798/sentiment_repo_cicd' // Prefix for Docker images
     }
 
     stages {
@@ -43,16 +43,16 @@ pipeline {
                 script {
                     docker.withRegistry('', 'DockerHubCred') {
                         // Tag and push the sentiment API image
-                        sh "docker tag ${DOCKER_IMAGE_NAME}/sentiment_api aks00798/${DOCKER_IMAGE_NAME}_sentiment_api:latest"
-                        sh "docker push aks00798/${DOCKER_IMAGE_NAME}_sentiment_api"
+                        sh "docker tag ${DOCKER_IMAGE_NAME_PREFIX}/sentiment_api ${DOCKER_IMAGE_NAME_PREFIX}_sentiment_api:latest"
+                        sh "docker push ${DOCKER_IMAGE_NAME_PREFIX}_sentiment_api:latest"
 
                         // Tag and push the monitoring service image
-                        sh "docker tag ${DOCKER_IMAGE_NAME}/monitoring_service aks00798/${DOCKER_IMAGE_NAME}_monitoring_service:latest"
-                        sh "docker push aks00798/${DOCKER_IMAGE_NAME}_monitoring_service"
+                        sh "docker tag ${DOCKER_IMAGE_NAME_PREFIX}/monitoring_service ${DOCKER_IMAGE_NAME_PREFIX}_monitoring_service:latest"
+                        sh "docker push ${DOCKER_IMAGE_NAME_PREFIX}_monitoring_service:latest"
 
                         // Tag and push the Streamlit app image
-                        sh "docker tag ${DOCKER_IMAGE_NAME}/streamlit_app aks00798/${DOCKER_IMAGE_NAME}_streamlit_app:latest"
-                        sh "docker push aks00798/${DOCKER_IMAGE_NAME}_streamlit_app"
+                        sh "docker tag ${DOCKER_IMAGE_NAME_PREFIX}/streamlit_app ${DOCKER_IMAGE_NAME_PREFIX}_streamlit_app:latest"
+                        sh "docker push ${DOCKER_IMAGE_NAME_PREFIX}_streamlit_app:latest"
                     }
                 }
             }
@@ -62,9 +62,9 @@ pipeline {
             steps {
                 sh '''
                     echo "🚀 Pulling Docker Images for Local Deployment..."
-                    docker pull aks00798/${DOCKER_IMAGE_NAME}_sentiment_api:latest
-                    docker pull aks00798/${DOCKER_IMAGE_NAME}_monitoring_service:latest
-                    docker pull aks00798/${DOCKER_IMAGE_NAME}_streamlit_app:latest
+                    docker pull ${DOCKER_IMAGE_NAME_PREFIX}_sentiment_api:latest
+                    docker pull ${DOCKER_IMAGE_NAME_PREFIX}_monitoring_service:latest
+                    docker pull ${DOCKER_IMAGE_NAME_PREFIX}_streamlit_app:latest
 
                     echo "🔧 Starting Docker Compose for Local Deployment..."
                     docker compose up -d
