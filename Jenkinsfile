@@ -66,6 +66,10 @@ pipeline {
                     docker pull ${DOCKER_IMAGE_NAME_PREFIX}_monitoring_service:latest
                     docker pull ${DOCKER_IMAGE_NAME_PREFIX}_streamlit_app:latest
 
+                    echo "🔄 Cleaning up existing containers..."
+                    docker ps -a | grep mlflow_tracking && docker stop mlflow_tracking && docker rm mlflow_tracking || echo "No existing mlflow_tracking container to remove."
+
+
                     echo "🔧 Starting Docker Compose for Local Deployment..."
                     docker compose up -d
 
