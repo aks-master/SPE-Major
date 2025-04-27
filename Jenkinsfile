@@ -15,9 +15,16 @@ pipeline {
         stage('Set Up Python') {
             steps {
                 script {
-                    def pythonInstalled = sh(script: 'python --version', returnStatus: true)
+                    // Check if Python is installed; install it if missing
+                    def pythonInstalled = sh(script: 'command -v python3', returnStatus: true)
                     if (pythonInstalled != 0) {
-                        error("Python is not installed or not available in the PATH. Build failed.")
+                        echo "Python is not installed. Installing Python..."
+                        sh '''
+                            sudo apt-get update
+                            sudo apt-get install -y python3 python3-pip
+                        '''
+                    } else {
+                        echo "Python is already installed."
                     }
                 }
             }
