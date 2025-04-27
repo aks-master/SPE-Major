@@ -74,6 +74,9 @@ pipeline {
 
                     # Check and remove conflicting container for streamlit_app
                     docker ps -a | grep streamlit_app && docker stop streamlit_app && docker rm streamlit_app || echo "No existing streamlit_app container to remove."
+                    
+                    # Check and remove conflicting container for sentiment_api
+                    docker ps -a | grep sentiment_api && docker stop sentiment_api && docker rm sentiment_api || echo "No existing sentiment_api container to remove."
 
 
                     echo "🔧 Starting Docker Compose for Local Deployment..."
