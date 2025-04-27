@@ -90,4 +90,17 @@ pipeline {
             }
         }
     }
+    post {
+        success {
+            mail to: 'amit33301@gmail.com', 
+                 subject: "✅ Build Successful: SPE Major Project",
+                 body: "Build ${env.JOB_NAME} #${env.BUILD_NUMBER} succeeded.\nLogs: ${env.BUILD_URL}"
+        }
+
+        failure {
+            mail to: 'amit33301@gmail.com', 
+                 subject: "❌ Build Failed: SPE Major Project",
+                 body: "Build ${env.JOB_NAME} #${env.BUILD_NUMBER} failed.\nLogs: ${env.BUILD_URL}"
+        }
+    }
 }
