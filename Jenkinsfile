@@ -66,8 +66,14 @@ pipeline {
                     docker pull ${DOCKER_IMAGE_NAME_PREFIX}_monitoring_service:latest
                     docker pull ${DOCKER_IMAGE_NAME_PREFIX}_streamlit_app:latest
 
-                    echo "🔄 Cleaning up existing containers..."
+                    # Check and remove conflicting container for mlflow_tracking
                     docker ps -a | grep mlflow_tracking && docker stop mlflow_tracking && docker rm mlflow_tracking || echo "No existing mlflow_tracking container to remove."
+
+                    # Check and remove conflicting container for monitoring_service
+                    docker ps -a | grep monitoring_service && docker stop monitoring_service && docker rm monitoring_service || echo "No existing monitoring_service container to remove."
+
+                    # Check and remove conflicting container for streamlit_app
+                    docker ps -a | grep streamlit_app && docker stop streamlit_app && docker rm streamlit_app || echo "No existing streamlit_app container to remove."
 
 
                     echo "🔧 Starting Docker Compose for Local Deployment..."
