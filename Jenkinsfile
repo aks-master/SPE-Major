@@ -82,22 +82,26 @@ pipeline {
                     docker ps -a | grep sentiment_api && docker stop sentiment_api && docker rm sentiment_api || echo "No existing sentiment_api container to remove."
 
 
+                    # Apply the manifests in order using the kubeconfig file
+                    export KUBECONFIG="$KUBECONFIG_FILE"
+                    
+                    # Debug: Check if kubeconfig is valid
+                    kubectl config view --minify
+                    
                     # Apply the manifests in order
-                    # Apply Kubernetes manifests using the credentials
-                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/01-namespace.yaml
-                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/02-configmap.yaml
-                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/03-persistent-volume.yaml
-                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/04-mlflow-deployment.yaml
-                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/05-monitoring-deployment.yaml
-                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/06-backend-deployment.yaml
-                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/07-frontend-deployment.yaml
-                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/08-prometheus.yaml
-                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/09-grafana.yaml
-                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/10-ingress.yaml
+                    kubectl apply -f k8s/01-namespace.yaml
+                    kubectl apply -f k8s/02-configmap.yaml
+                    kubectl apply -f k8s/03-persistent-volume.yaml
+                    kubectl apply -f k8s/04-mlflow-deployment.yaml
+                    kubectl apply -f k8s/05-monitoring-deployment.yaml
+                    kubectl apply -f k8s/06-backend-deployment.yaml
+                    kubectl apply -f k8s/07-frontend-deployment.yaml
+                    kubectl apply -f k8s/08-prometheus.yaml
+                    kubectl apply -f k8s/09-grafana.yaml
+                    kubectl apply -f k8s/10-ingress.yaml
                     
                     # Verify deployments
-                    kubectl --kubeconfig=$KUBECONFIG get pods -n sentiment-analysis
-                '''
+                    kubectl get pods -n sentiment-analysis
             }
         }
     }
