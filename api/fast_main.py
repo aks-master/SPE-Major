@@ -11,6 +11,7 @@ from pydantic import BaseModel
 from predict import predict_sentiment
 from database_api import save_text_to_db
 from databases.update_csv import updated_csv
+from prometheus_fastapi_instrumentator import Instrumentator
 
 app = FastAPI()
 
@@ -76,6 +77,10 @@ class SentimentResponse(BaseModel):
     text: str
     sentiment: str
     model_updated_at: str
+
+@app.on_event("startup")
+async def startup_prometheus():
+    Instrumentator().instrument(app).expose(app)
 
 @app.post("/predict/", response_model=SentimentResponse)
 def predict(request: SentimentRequest):

@@ -1,0 +1,46 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sentiment-analysis-ingress
+  namespace: sentiment-analysis
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /api(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: sentiment-api-service
+            port:
+              number: 8000
+      - path: /app(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: streamlit-service
+            port:
+              number: 8501
+      - path: /mlflow(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: mlflow-service
+            port:
+              number: 5000
+      - path: /prometheus(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: prometheus-service
+            port:
+              number: 9090
+      - path: /grafana(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: grafana-service
+            port:
+              number: 3000

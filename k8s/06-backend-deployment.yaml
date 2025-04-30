@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sentiment-api
+  namespace: sentiment-analysis
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sentiment-api
+  template:
+    metadata:
+      labels:
+        app: sentiment-api
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "8000"
+    spec:
+      containers:
+      - name: sentiment-api
+        image: aks00798/sentiment_repo_cicd/sentiment_api:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: sentiment-app-config
+              key: DATABASE_URL
+        - name: MLFLOW_TRACKING_URI
+          valueFrom:
+            configMapKeyRef:
+              name: sentiment-app-config
+              key: MLFLOW_TRACKING_URI
+        volumeMounts:
+        - name: shared-data
+          mountPath: /app/databases
+        - name: shared-data
+          mountPath: /app/monitoring
+        - name: shared-data
+          mountPath: /app/logs
+        - name: shared-data
+          mountPath: /app/STEPS
+        - name: shared-data
+          mountPath: /app/preprocess
+        - name: shared-data
+          mountPath: /app/DATA
+        - name: shared-data
+          mountPath: /app/cicd
+        - name: shared-data
+          mountPath: /app/model_making
+        - name: shared-data
+          mountPath: /app/Save_model
+        readinessProbe:
+          httpGet:
+            path: /docs
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /docs
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 30
+      volumes:
+      - name: shared-data
+        persistentVolumeClaim:
+          claimName: sentiment-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sentiment-api-service
+  namespace: sentiment-analysis
+spec:
+  selector:
+    app: sentiment-api
+  ports:
+  - port: 8000
+    targetPort: 8000
+  type: ClusterIP
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: sentiment-api-hpa
+  namespace: sentiment-analysis
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: sentiment-api
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70

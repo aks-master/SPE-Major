@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monitoring-service
+  namespace: sentiment-analysis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: monitoring-service
+  template:
+    metadata:
+      labels:
+        app: monitoring-service
+    spec:
+      containers:
+      - name: monitoring-service
+        image: aks00798/sentiment_repo_cicd/monitoring_service:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "300m"
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: sentiment-app-config
+              key: DATABASE_URL
+        - name: MLFLOW_TRACKING_URI
+          valueFrom:
+            configMapKeyRef:
+              name: sentiment-app-config
+              key: MLFLOW_TRACKING_URI
+        volumeMounts:
+        - name: shared-data
+          mountPath: /app/databases
+        - name: shared-data
+          mountPath: /app/logs
+        - name: shared-data
+          mountPath: /app/monitoring
+        - name: shared-data
+          mountPath: /app/STEPS
+        - name: shared-data
+          mountPath: /app/preprocess
+        - name: shared-data
+          mountPath: /app/DATA
+        - name: shared-data
+          mountPath: /app/cicd
+        - name: shared-data
+          mountPath: /app/model_making
+        - name: shared-data
+          mountPath: /app/Save_model
+      volumes:
+      - name: shared-data
+        persistentVolumeClaim:
+          claimName: sentiment-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: monitoring-service
+  namespace: sentiment-analysis
+spec:
+  selector:
+    app: monitoring-service
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP

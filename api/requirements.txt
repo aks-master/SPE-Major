@@ -7,3 +7,4 @@ databases
 pandas
 numpy
 nltk
+prometheus-fastapi-instrumentator

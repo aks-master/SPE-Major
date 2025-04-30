@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: streamlit-app
+  namespace: sentiment-analysis
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: streamlit-app
+  template:
+    metadata:
+      labels:
+        app: streamlit-app
+    spec:
+      containers:
+      - name: streamlit-app
+        image: aks00798/sentiment_repo_cicd/streamlit_app:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8501
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "300m"
+        env:
+        - name: DATABASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: sentiment-app-config
+              key: DATABASE_URL
+        volumeMounts:
+        - name: shared-data
+          mountPath: /app/databases
+        - name: shared-data
+          mountPath: /app/logs
+      volumes:
+      - name: shared-data
+        persistentVolumeClaim:
+          claimName: sentiment-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: streamlit-service
+  namespace: sentiment-analysis
+spec:
+  selector:
+    app: streamlit-app
+  ports:
+  - port: 8501
+    targetPort: 8501
+  type: ClusterIP

@@ -79,13 +79,22 @@ pipeline {
                     docker ps -a | grep sentiment_api && docker stop sentiment_api && docker rm sentiment_api || echo "No existing sentiment_api container to remove."
 
 
-                    echo "🔧 Starting Docker Compose for Local Deployment..."
-                    docker compose up -d
+                    # Apply the manifests in order
+kubectl apply -f k8s/01-namespace.yaml
+kubectl apply -f k8s/02-configmap.yaml
+kubectl apply -f k8s/03-persistent-volume.yaml
+kubectl apply -f k8s/04-mlflow-deployment.yaml
+kubectl apply -f k8s/05-monitoring-deployment.yaml
+kubectl apply -f k8s/06-backend-deployment.yaml
+kubectl apply -f k8s/07-frontend-deployment.yaml
+kubectl apply -f k8s/08-prometheus.yaml
+kubectl apply -f k8s/09-grafana.yaml
+kubectl apply -f k8s/10-ingress.yaml
 
-                    echo "🎉 Deployment Complete!"
-                    echo "🖥️  Backend API accessible at: http://localhost:8000"
-                    echo "🌐 Frontend (Streamlit) accessible at: http://localhost:8501"
-                    echo "📊 MLflow Dashboard accessible at: http://localhost:5000"
+# Verify your deployments
+kubectl get pods -n sentiment-analysis
+kubectl get svc -n sentiment-analysis
+kubectl get hpa -n sentiment-analysis
                 '''
             }
         }
