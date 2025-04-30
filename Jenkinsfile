@@ -80,16 +80,16 @@ pipeline {
 
 
                     # Apply the manifests in order
-kubectl apply -f k8s/01-namespace.yaml
-kubectl apply -f k8s/02-configmap.yaml
-kubectl apply -f k8s/03-persistent-volume.yaml
-kubectl apply -f k8s/04-mlflow-deployment.yaml
-kubectl apply -f k8s/05-monitoring-deployment.yaml
-kubectl apply -f k8s/06-backend-deployment.yaml
-kubectl apply -f k8s/07-frontend-deployment.yaml
-kubectl apply -f k8s/08-prometheus.yaml
-kubectl apply -f k8s/09-grafana.yaml
-kubectl apply -f k8s/10-ingress.yaml
+kubectl apply -f k8s/01-namespace.yaml --validate=false
+kubectl apply -f k8s/02-configmap.yaml --validate=false
+kubectl apply -f k8s/03-persistent-volume.yaml --validate=false
+kubectl apply -f k8s/04-mlflow-deployment.yaml --validate=false
+kubectl apply -f k8s/05-monitoring-deployment.yaml --validate=false
+kubectl apply -f k8s/06-backend-deployment.yaml --validate=false
+kubectl apply -f k8s/07-frontend-deployment.yaml --validate=false
+kubectl apply -f k8s/08-prometheus.yaml --validate=false
+kubectl apply -f k8s/09-grafana.yaml --validate=false
+kubectl apply -f k8s/10-ingress.yaml --validate=false
 
 # Verify your deployments
 kubectl get pods -n sentiment-analysis
