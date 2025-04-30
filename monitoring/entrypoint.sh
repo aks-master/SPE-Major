@@ -17,5 +17,5 @@ while true; do
     python monitoring/mlflow_tracking.py
     python monitoring/drift_detection.py
     echo "Monitoring complete. Sleeping for 1 hour..."
-    sleep 3600  # Run monitoring every hour
+    sleep 3600*24*10  # Run monitoring every 10 days
 done
