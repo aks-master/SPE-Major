@@ -102,6 +102,7 @@ pipeline {
                     
                     # Verify deployments
                     kubectl get pods -n sentiment-analysis
+                '''
             }
         }
     }
