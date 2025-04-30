@@ -59,6 +59,9 @@ pipeline {
         }
 
         stage('Local Deployment') {
+             environment {
+                KUBECONFIG = credentials('kubernetes-config')
+            }
             steps {
                 sh '''
                     echo "🚀 Pulling Docker Images for Local Deployment..."
@@ -80,21 +83,20 @@ pipeline {
 
 
                     # Apply the manifests in order
-kubectl apply -f k8s/01-namespace.yaml --validate=false
-kubectl apply -f k8s/02-configmap.yaml --validate=false
-kubectl apply -f k8s/03-persistent-volume.yaml --validate=false
-kubectl apply -f k8s/04-mlflow-deployment.yaml --validate=false
-kubectl apply -f k8s/05-monitoring-deployment.yaml --validate=false
-kubectl apply -f k8s/06-backend-deployment.yaml --validate=false
-kubectl apply -f k8s/07-frontend-deployment.yaml --validate=false
-kubectl apply -f k8s/08-prometheus.yaml --validate=false
-kubectl apply -f k8s/09-grafana.yaml --validate=false
-kubectl apply -f k8s/10-ingress.yaml --validate=false
-
-# Verify your deployments
-kubectl get pods -n sentiment-analysis
-kubectl get svc -n sentiment-analysis
-kubectl get hpa -n sentiment-analysis
+                    # Apply Kubernetes manifests using the credentials
+                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/01-namespace.yaml
+                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/02-configmap.yaml
+                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/03-persistent-volume.yaml
+                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/04-mlflow-deployment.yaml
+                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/05-monitoring-deployment.yaml
+                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/06-backend-deployment.yaml
+                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/07-frontend-deployment.yaml
+                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/08-prometheus.yaml
+                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/09-grafana.yaml
+                    kubectl --kubeconfig=$KUBECONFIG apply -f k8s/10-ingress.yaml
+                    
+                    # Verify deployments
+                    kubectl --kubeconfig=$KUBECONFIG get pods -n sentiment-analysis
                 '''
             }
         }
